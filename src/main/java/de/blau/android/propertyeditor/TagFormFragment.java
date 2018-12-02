@@ -336,6 +336,7 @@ public class TagFormFragment extends BaseFragment implements FormUpdate {
 
         if (key != null && key.length() > 0) {
             Set<String> usedKeys = allTags.keySet();
+
             if (TagEditorFragment.isStreetName(key, usedKeys)) {
                 adapter = nameAdapters.getStreetNameAdapter(values);
             } else if (TagEditorFragment.isPlaceName(key, usedKeys)) {
@@ -358,10 +359,17 @@ public class TagFormFragment extends BaseFragment implements FormUpdate {
                     }
                 }
             } else {
-                HashMap<String, Integer> counter = new HashMap<>();
+                Map<String, Integer> counter = new HashMap<>();
                 ArrayAdapter<StringWithDescription> adapter2 = new ArrayAdapter<>(getActivity(), R.layout.autocomplete_row);
 
                 if (preset != null) {
+                    List<String> mruValues = App.getMruTags().getValues(preset, key);
+                    if (mruValues != null) {
+                        for (String v:mruValues) {                            
+                            adapter2.add(new StringWithDescription(v));
+                            counter.put(v, 1);
+                        }
+                    }
                     Collection<StringWithDescription> presetValues;
                     if (field != null) {
                         presetValues = preset.getAutocompleteValues(field);
@@ -384,6 +392,12 @@ public class TagFormFragment extends BaseFragment implements FormUpdate {
                         Log.d(DEBUG_TAG, "key " + key + " type " + preset.getKeyType(key));
                     }
                 } else {
+                    List<String> mruValues = App.getMruTags().getValues(key);
+                    if (mruValues != null) {
+                        for (String v : mruValues) {
+                            adapter2.add(new StringWithDescription(v));
+                        }
+                    }
                     OsmElement element = propertyEditorListener.getElement();
                     if (propertyEditorListener.getPresets() != null) {
                         Log.d(DEBUG_TAG, "generate suggestions for >" + key + "< from presets");
@@ -404,6 +418,7 @@ public class TagFormFragment extends BaseFragment implements FormUpdate {
                             StringWithDescription s = new StringWithDescription(value);
                             // FIXME determine description in some way
                             // ValueWithCount v = new ValueWithCount(value, 1);
+                            adapter2.remove(s);
                             adapter2.insert(s, 0);
                         }
                     }
