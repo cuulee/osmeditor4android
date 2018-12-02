@@ -218,6 +218,8 @@ public class App extends android.app.Application {
             if (currentPresets == null) {
                 Preferences prefs = new Preferences(ctx);
                 currentPresets = prefs.getPreset();
+                mruTags = new MRUTags();
+                mruTags.load(ctx);
             }
             return currentPresets;
         }
