@@ -1495,7 +1495,7 @@ public class Logic {
      * @param activity activity this was called from, if null no warnings will be displayed
      * @param x screen-coordinate
      * @param y screen-coordinate
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation coudn't be performed
      */
     public synchronized void performAdd(@Nullable final Activity activity, final float x, final float y) throws OsmIllegalOperationException {
         Log.d(DEBUG_TAG, "performAdd");
@@ -1796,7 +1796,7 @@ public class Logic {
      * @param mergeInto Way to merge the other way into. This way will be kept.
      * @param mergeFrom Way to merge into the other. This way will be deleted.
      * @return a MergeResult with the merged OsmElement and a list of issues if any
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     public synchronized MergeResult performMerge(@Nullable final FragmentActivity activity, @NonNull Way mergeInto, @NonNull Way mergeFrom)
             throws OsmIllegalOperationException {
@@ -1813,7 +1813,7 @@ public class Logic {
      * @param activity activity this was called from, if null no warnings will be displayed
      * @param sortedWays list of ways to be merged
      * @return false if there were tag conflicts
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     @NonNull
     public synchronized MergeResult performMerge(@Nullable FragmentActivity activity, @NonNull List<OsmElement> sortedWays)
@@ -1908,7 +1908,7 @@ public class Logic {
     /**
      * If any ways are close to the node (within the tolerance), return the way.
      * 
-     * @param nodeToJoin
+     * @param nodeToJoin the Node we want to join
      * @return the closest way to the node
      */
     public OsmElement findJoinableElement(Node nodeToJoin) {
@@ -1960,7 +1960,7 @@ public class Logic {
      * @param element Node or Way that the node will be joined to.
      * @param nodeToJoin Node to be joined to the way.
      * @return true if the operation was successful
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     public synchronized MergeResult performJoin(@Nullable FragmentActivity activity, @NonNull OsmElement element, @NonNull Node nodeToJoin)
             throws OsmIllegalOperationException {
@@ -2082,7 +2082,7 @@ public class Logic {
      * @param activity activity this method was called from, if null no warnings will be displayed
      * @param x screen x coordinate
      * @param y screen y coordinate
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     public synchronized void performAppendAppend(@Nullable final Activity activity, final float x, final float y) throws OsmIllegalOperationException {
         Log.d(DEBUG_TAG, "performAppendAppend");
@@ -2122,7 +2122,7 @@ public class Logic {
      * @param x the x screen coordinate
      * @param y the y screen coordinate
      * @return the selected node or the created node, if x,y lays on a way. Null if any node or way was selected.
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     private synchronized Node getClickedNodeOrCreatedWayNode(final float x, final float y) throws OsmIllegalOperationException {
         return getClickedNodeOrCreatedWayNode(null, x, y, false);
@@ -2137,7 +2137,7 @@ public class Logic {
      * @param y the y screen coordinate
      * @param forceNew do not return existing nodes in tolerance range
      * @return the selected node or the created node, if x,y lays on a way. null if any node or way was selected.
-     * @throws OsmIllegalOperationException
+     * @throws OsmIllegalOperationException if the operation couldn't be performed
      */
     @Nullable
     private synchronized Node getClickedNodeOrCreatedWayNode(@Nullable List<Way> ways, final float x, final float y, boolean forceNew)
@@ -2776,7 +2776,14 @@ public class Logic {
         class DownLoadElementsTask extends AsyncTask<Void, Void, Integer> {
             int result = 0;
 
-            long[] toLongArray(List<Long> list) {
+            /**
+             * Convert a List<Long> to an array of long
+             * 
+             * @param list the List of Long
+             * @return an array holding the corresonding long values
+             */
+            @NonNull
+            long[] toLongArray(@NonNull List<Long> list) {
                 long[] result = new long[list.size()];
                 for (int i = 0; i < list.size(); i++) {
                     result[i] = list.get(i);
@@ -3123,12 +3130,12 @@ public class Logic {
      * Read a stream in PBF format
      * 
      * @param activity activity that called this
-     * @param is InputStream
+     * @param uri the file uri
      * @param add unused currently (if there are new objects in the file they could potentially conflict with in memory
      *            ones)
      * @throws FileNotFoundException when the selected file could not be found
      */
-    public void readPbfFile(@NonNull final FragmentActivity activity, Uri uri, boolean add) throws FileNotFoundException {
+    public void readPbfFile(@NonNull final FragmentActivity activity, @NonNull Uri uri, boolean add) throws FileNotFoundException {
         final InputStream is;
 
         if (uri.getScheme().equals("file")) {
@@ -3292,9 +3299,11 @@ public class Logic {
     /**
      * Loads data from a file in the background.
      * 
-     * @param context
+     * @param activity the calling FragmentActivity
+     * @param postLoad a callback to call after loading
+     * 
      */
-    void loadStateFromFile(@NonNull final FragmentActivity activity, final PostAsyncActionHandler postLoad) {
+    void loadStateFromFile(@NonNull final FragmentActivity activity, @Nullable final PostAsyncActionHandler postLoad) {
 
         final int READ_FAILED = 0;
         final int READ_OK = 1;
@@ -3658,12 +3667,13 @@ public class Logic {
     /**
      * Uploads a GPS track to the server.
      * 
+     * @param activity he calling FragementActivity
      * @param track the track to upload
      * @param description a description of the track sent to the server
      * @param tags the tags to apply to the GPS track (comma delimeted)
      * @param visibility the track visibility, one of the following: private, public, trackable, identifiable
      */
-    public void uploadTrack(@NonNull final FragmentActivity activity, final Track track, final String description, final String tags,
+    public void uploadTrack(@NonNull final FragmentActivity activity, @NonNull final Track track, final String description, final String tags,
             final Visibility visibility) {
         final Server server = prefs.getServer();
         new AsyncTask<Void, Void, Integer>() {
@@ -4411,9 +4421,9 @@ public class Logic {
     /**
      * Set relation members to be highlighted
      * 
-     * @param r
+     * @param r the Relation holding the members
      */
-    public void selectRelation(Relation r) {
+    public void selectRelation(@Nullable Relation r) {
         if (r != null) {
             for (RelationMember rm : r.getMembers()) {
                 OsmElement e = rm.getElement();
@@ -4883,7 +4893,7 @@ public class Logic {
     /**
      * Set the list of last comments
      * 
-     * @param comments
+     * @param comments the List to set
      */
     public void setLastComments(ArrayList<String> comments) {
         lastComments = new MRUList<>(comments);
@@ -4911,7 +4921,7 @@ public class Logic {
     /**
      * Set the list of last used source strings
      * 
-     * @param sources
+     * @param sources the Lsit to set
      */
     public void setLastSources(ArrayList<String> sources) {
         lastSources = new MRUList<>(sources);
@@ -4921,6 +4931,7 @@ public class Logic {
     /**
      * @return the current object filter
      */
+    @Nullable
     public Filter getFilter() {
         return filter;
     }
@@ -4928,9 +4939,9 @@ public class Logic {
     /**
      * Set the object filter
      * 
-     * @param filter
+     * @param filter the Filter to set or null
      */
-    public void setFilter(Filter filter) {
+    public void setFilter(@Nullable Filter filter) {
         this.filter = filter;
     }
 
@@ -4969,9 +4980,10 @@ public class Logic {
      * @param activity activity this method was called from, if null no warnings will be displayed
      * @param e1 first OsmElement
      * @param e2 2nd OsmELement
-     * @param checkRelationsOnly
+     * @param checkRelationsOnly if true only check Relations
      */
-    private <T extends OsmElement> void displayAttachedObjectWarning(@Nullable FragmentActivity activity, T e1, T e2, boolean checkRelationsOnly) {
+    private <T extends OsmElement> void displayAttachedObjectWarning(@Nullable FragmentActivity activity, @NonNull T e1, @NonNull T e2,
+            boolean checkRelationsOnly) {
         ArrayList<T> a = new ArrayList<>();
         a.add(e1);
         a.add(e2);
@@ -4995,7 +5007,7 @@ public class Logic {
      * @param <T> the OsmElement type
      * @param activity activity this method was called from, if null no warnings will be displayed
      * @param list List of OsmElements
-     * @param checkRelationsOnly
+     * @param checkRelationsOnly if true only check Relations
      */
     private <T extends OsmElement> void displayAttachedObjectWarning(@Nullable FragmentActivity activity, Collection<T> list, boolean checkRelationsOnly) {
         if (getFilter() != null && showAttachedObjectWarning()) {

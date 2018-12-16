@@ -243,7 +243,7 @@ public class PhotoIndex extends SQLiteOpenHelper {
      * Return all photographs in a given bounding box If necessary fill in-memory index first
      * 
      * @param box
-     * @return
+     * @return a Collection of the Photos in the BoundingBox
      */
     public Collection<Photo> getPhotos(BoundingBox box) {
         RTree index = App.getPhotoIndex();

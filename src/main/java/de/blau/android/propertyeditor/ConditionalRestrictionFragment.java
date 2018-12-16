@@ -124,8 +124,17 @@ public class ConditionalRestrictionFragment extends DialogFragment implements On
     private transient boolean loadedDefault = false;
 
     /**
+     * Get a new instance of the Fragment
+     * 
+     * @param key the key in question
+     * @param value any existing value
+     * @param templates a List of templates
+     * @param ohTemplates a List of opening_hours templates (not used)
+     * @return a ConditionalRestrictionFragment instance
      */
-    public static ConditionalRestrictionFragment newInstance(String key, String value, ArrayList<String> templates, ArrayList<String> ohTemplates) {
+    @NonNull
+    public static ConditionalRestrictionFragment newInstance(@NonNull String key, @Nullable String value, @NonNull ArrayList<String> templates,
+            ArrayList<String> ohTemplates) {
         ConditionalRestrictionFragment f = new ConditionalRestrictionFragment();
 
         Bundle args = new Bundle();
@@ -893,10 +902,11 @@ public class ConditionalRestrictionFragment extends DialogFragment implements On
     }
 
     /**
-     * Return the view we have our rows in and work around some android craziness
+     * Return the view we have our views in and work around some android craziness
      * 
-     * @return
+     * @return a View containing the UI elements or null
      */
+    @Nullable
     public View getOurView() {
         // android.support.v4.app.NoSaveStateFrameLayout
         View v = getView();
