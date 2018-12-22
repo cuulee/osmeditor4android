@@ -39,6 +39,8 @@ public class OsmParser extends DefaultHandler {
     private static final String DEBUG_TAG = OsmParser.class.getSimpleName();
 
     private static final String TAG = "tag";
+    
+    private static final String OSM = "osm";
 
     protected static final String OSM_CHANGE_DELETE = "delete";
 
@@ -181,6 +183,8 @@ public class OsmParser extends DefaultHandler {
                 break;
             case BoundingBox.NAME:
                 parseBounds(atts);
+                break;
+            case OSM:
                 break;
             default:
                 throw new OsmParseException("Unknown element " + name);
